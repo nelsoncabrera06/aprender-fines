@@ -1,0 +1,26 @@
+- Traducir:
+
+Facil
+de Finlandes a Español
+de Finlandes a Ingles 
+
+Dificil
+de Español a Finlandes 
+de Ingles a Ingles
+
+Ejemplo:
+Seitseman = Siete / 7 ( respuesta - Facil )
+Siete / 7 = Seitseman / 7 ( respuesta - Dificil )
+
+- Unir con flechas
+Aca la dificultad seria lo mismo
+Tengo dos columnas con palabras
+Una en finlandes -------- otra en Español
+y tengo que unir con flechas cada una
+
+
+Mi enfoque en esto va a ser mucho de memorizar
+y gramatica, ya que duolingo va por cualquier lado
+voy a seguir la estructura del libro Suomen Mestari 1
+
+

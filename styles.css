@@ -1,0 +1,40 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: 100px;
+}
+.column {
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+}
+.item {
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    text-align: center;
+}
+
+.item.clicked {
+    background-color: #a0c0f0; /* Color cuando se hace clic */
+}
+
+.item.unclicked {
+    background-color: #f0f0f0;
+}
+
+.item.correct {
+    background-color: #90ee90; /* Verde claro */
+}
+.item.incorrect {
+    background-color: #ffcccb; /* Rojo claro */
+}
+.status {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 20px;
+    display: none;
+}
+

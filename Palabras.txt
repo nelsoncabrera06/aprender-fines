@@ -1,0 +1,4 @@
+car auto
+plane avion
+dog perro
+cat gato
