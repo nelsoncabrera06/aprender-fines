@@ -1,0 +1,12 @@
+# Carpeta de backups o compilados
+backup/
+dist/
+Fotos
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Archivos del sistema
+.DS_Store
+
