@@ -1,7 +1,7 @@
 # Carpeta de backups o compilados
 backup/
 dist/
-Fotos
+Fotos/
 
 # Archivos temporales
 *.log
