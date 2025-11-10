@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprender Finlandés desde Español - Sanasto</title>
+    <link rel="stylesheet" href="../resources/styles.css">
+    <style>
+        .practice-input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .practice-input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        .practice-input.correct {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+        .practice-input.incorrect {
+            border-color: #f44336;
+            background: #fef1f0;
+        }
+        .timer {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4a90e2;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .timer.warning {
+            color: #ff9800;
+            animation: pulse 1s infinite;
+        }
+        .timer.danger {
+            color: #f44336;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .stats-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .stats-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .practice-btn {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .practice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+        .check-btn {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+        }
+        .reset-btn {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="book-page">
+        <h1>📚 Aprender Finlandés desde Español</h1>
+
+        <!-- Encabezado -->
+        <div class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div style="background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; padding: 10px 20px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">
+                    <strong style="font-size: 1.1em;">Kappale 1</strong>
+                </div>
+
+                <!-- Botón de Practicar -->
+                <button id="practiceBtn" class="practice-btn" onclick="startPractice()">
+                    🎯 Comenzar Práctica
+                </button>
+
+                <div style="background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); color: white; padding: 10px 20px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.2);">
+                    <strong style="font-size: 1.1em;">Sanasto</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temporizador -->
+        <div id="timerSection" style="display: none; margin-top: 20px;">
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+                <p style="margin: 0 0 10px 0; color: #666;">Tiempo restante:</p>
+                <div id="timer" class="timer">2:00</div>
+                <button id="checkBtn" class="practice-btn check-btn" onclick="checkAnswers()" style="margin-top: 10px;">
+                    ✓ Verificar Respuestas
+                </button>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div id="resultsSection" style="display: none; margin-top: 20px;">
+            <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                <h2 style="text-align: center; color: #2c3e50; margin-bottom: 25px;">📊 Resultados de la Práctica</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white;">
+                        <div>✓ Correctas</div>
+                        <div id="correctCount" class="stats-number">0</div>
+                    </div>
+                    <div class="stats-card" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); color: white;">
+                        <div>✗ Incorrectas</div>
+                        <div id="incorrectCount" class="stats-number">0</div>
+                    </div>
+                    <div class="stats-card" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); color: white;">
+                        <div>⏱️ Tiempo</div>
+                        <div id="timeUsed" class="stats-number">0:00</div>
+                    </div>
+                    <div class="stats-card" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white;">
+                        <div>🏆 Puntaje</div>
+                        <div id="score" class="stats-number">0/100</div>
+                    </div>
+                </div>
+                <div style="text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button id="saveBtn" class="practice-btn" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);" onclick="saveCurrentResult()">
+                        💾 Guardar Resultado
+                    </button>
+                    <button class="practice-btn reset-btn" onclick="resetPractice()">
+                        🔄 Intentar de Nuevo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vocabulario -->
+        <div id="vocabularySection" class="section" style="margin-top: 25px;">
+            <div style="background: #f0f5fa; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+
+                    <!-- Columna 1 -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;" id="vocab-col-1"></div>
+
+                    <!-- Columna 2 -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;" id="vocab-col-2"></div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Frases (Fraasit) -->
+        <div class="section" style="margin-top: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                <h3 style="color: #2c3e50; margin: 0; font-size: 1.3em;">Fraasit</h3>
+                <button id="practiceFrasesBtn" class="practice-btn" onclick="startFrasesPractice()">
+                    🎯 Comenzar Práctica
+                </button>
+            </div>
+
+            <!-- Temporizador Frases -->
+            <div id="timerFrasesSection" style="display: none; margin-bottom: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center;">
+                    <p style="margin: 0 0 10px 0; color: #666;">Tiempo restante:</p>
+                    <div id="timerFrases" class="timer">0:30</div>
+                    <button id="checkFrasesBtn" class="practice-btn check-btn" onclick="checkFrasesAnswers()" style="margin-top: 10px;">
+                        ✓ Verificar Respuestas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Resultados Frases -->
+            <div id="resultsFrasesSection" style="display: none; margin-bottom: 20px;">
+                <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                    <h2 style="text-align: center; color: #2c3e50; margin-bottom: 25px;">📊 Resultados de Fraasit</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                        <div class="stats-card" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); color: white;">
+                            <div>✓ Correctas</div>
+                            <div id="correctFrasesCount" class="stats-number">0</div>
+                        </div>
+                        <div class="stats-card" style="background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); color: white;">
+                            <div>✗ Incorrectas</div>
+                            <div id="incorrectFrasesCount" class="stats-number">0</div>
+                        </div>
+                        <div class="stats-card" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); color: white;">
+                            <div>⏱️ Tiempo</div>
+                            <div id="timeFrasesUsed" class="stats-number">0:00</div>
+                        </div>
+                        <div class="stats-card" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white;">
+                            <div>🏆 Puntaje</div>
+                            <div id="scoreFrases" class="stats-number">0/100</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button id="saveFrasesBtn" class="practice-btn" style="background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);" onclick="saveCurrentFrasesResult()">
+                            💾 Guardar Resultado
+                        </button>
+                        <button class="practice-btn reset-btn" onclick="resetFrasesPractice()">
+                            🔄 Intentar de Nuevo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido Frases -->
+            <div id="frasesSection" style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div id="frasesContent" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <!-- Se llenará dinámicamente con JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="page-number">página 12</div>
+    </div>
+
+    <script src="../resources/script.js"></script>
+    <script src="../resources/navigation.js"></script>
+    <script>
+        const vocabulary = [
+            {finnish: 'Hei!', spanish: '¡Hola!'},
+            {finnish: 'ja', spanish: 'y'},
+            {finnish: 'Tervetuloa!', spanish: '¡Bienvenido!'},
+            {finnish: 'Anteeksi!', spanish: '¡Disculpa!'},
+            {finnish: 'onko', spanish: '¿está?'},
+            {finnish: 'täällä', spanish: 'aquí'},
+            {finnish: 'suomen kurssi', spanish: 'curso de finés'},
+            {finnish: 'joo', spanish: 'sí'},
+            {finnish: 'olla', spanish: 'ser/estar'},
+            {finnish: 'tämä', spanish: 'este/esta'},
+            {finnish: 'paikka', spanish: 'lugar'},
+            {finnish: 'vapaa', spanish: 'libre'},
+            {finnish: 'kiva', spanish: 'bien/lindo'},
+            {finnish: 'minä', spanish: 'yo'},
+            {finnish: 'kuka', spanish: 'quién'},
+            {finnish: 'sinä', spanish: 'tú'},
+            {finnish: 'Hauska tutustua!', spanish: '¡Encantado de conocerte!'},
+            {finnish: 'Kiitos samoin!', spanish: '¡Gracias igualmente!'},
+            {finnish: 'Moi!', spanish: '¡Hola!'},
+            {finnish: 'Mitä kuuluu?', spanish: '¿Cómo estás?'},
+            {finnish: 'Terve!', spanish: '¡Hola!'},
+            {finnish: 'Kiitos!', spanish: '¡Gracias!'},
+            {finnish: 'Minulle kuuluu hyvää.', spanish: 'Estoy bien.'},
+            {finnish: 'Entä sinulle?', spanish: '¿Y tú?'},
+            {finnish: 'Ihan hyvää, kiitos.', spanish: 'Muy bien, gracias.'},
+            {finnish: 'tässä', spanish: 'aquí'},
+            {finnish: 'minun', spanish: 'mi'},
+            {finnish: 'nimi', spanish: 'nombre'},
+            {finnish: 'opettaja', spanish: 'profesor/a'},
+            {finnish: 'Miten se kirjoitetaan?', spanish: '¿Cómo se escribe?'},
+            {finnish: 'etunimi', spanish: 'nombre (de pila)'},
+            {finnish: 'sukunimi', spanish: 'apellido'},
+            {finnish: 'okei', spanish: 'ok/vale'},
+            {finnish: 'kurssipäivä', spanish: 'día de curso'},
+            {finnish: 'maanantai', spanish: 'lunes'},
+            {finnish: 'keskiviikko', spanish: 'miércoles'},
+            {finnish: 'torstai', spanish: 'jueves'},
+            {finnish: 'kello', spanish: 'reloj/hora'}
+        ];
+
+        let isPracticing = false;
+        let timer;
+        let timeRemaining = 120; // 2 minutos
+        let startTime;
+        let currentResult = null; // Guardar resultado actual
+
+        function renderVocabulary(practiceMode = false) {
+            const col1 = document.getElementById('vocab-col-1');
+            const col2 = document.getElementById('vocab-col-2');
+            col1.innerHTML = '';
+            col2.innerHTML = '';
+
+            const half = Math.ceil(vocabulary.length / 2);
+
+            vocabulary.forEach((word, index) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #ddd;';
+
+                const finnish = document.createElement('span');
+                finnish.style.cssText = 'color: #2c3e50; font-weight: 500;';
+                finnish.textContent = word.finnish;
+
+                const spanish = document.createElement('span');
+                spanish.id = `word-${index}`;
+                spanish.style.cssText = 'color: #666;';
+
+                if (practiceMode) {
+                    spanish.innerHTML = `<input type="text" class="practice-input" id="input-${index}" data-answer="${word.spanish.toLowerCase()}" placeholder="Escribe la traducción">`;
+                } else {
+                    spanish.textContent = word.spanish;
+                }
+
+                div.appendChild(finnish);
+                div.appendChild(spanish);
+
+                if (index < half) {
+                    col1.appendChild(div);
+                } else {
+                    col2.appendChild(div);
+                }
+            });
+        }
+
+        function startPractice() {
+            isPracticing = true;
+            timeRemaining = 120;
+            startTime = Date.now();
+
+            document.getElementById('practiceBtn').style.display = 'none';
+            document.getElementById('timerSection').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+
+            renderVocabulary(true);
+            startTimer();
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            timer = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+
+                if (timeRemaining <= 30) {
+                    document.getElementById('timer').className = 'timer warning';
+                }
+                if (timeRemaining <= 10) {
+                    document.getElementById('timer').className = 'timer danger';
+                }
+                if (timeRemaining <= 0) {
+                    checkAnswers();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer').textContent =
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Función para normalizar texto: quitar acentos, puntuación y espacios extras
+        function normalizeText(text) {
+            return text
+                .toLowerCase()
+                .trim()
+                // Remover signos de exclamación e interrogación
+                .replace(/[¡!¿?]/g, '')
+                // Remover acentos
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                // Remover espacios múltiples
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function checkAnswers() {
+            clearInterval(timer);
+
+            let correct = 0;
+            let incorrect = 0;
+
+            vocabulary.forEach((word, index) => {
+                const input = document.getElementById(`input-${index}`);
+                if (input) {
+                    const userAnswer = normalizeText(input.value);
+                    const correctAnswer = normalizeText(word.spanish);
+
+                    if (userAnswer === correctAnswer) {
+                        input.className = 'practice-input correct';
+                        correct++;
+                    } else {
+                        input.className = 'practice-input incorrect';
+                        input.value = `❌ ${input.value} | ✓ ${word.spanish}`;
+                        incorrect++;
+                    }
+                    input.disabled = true;
+                }
+            });
+
+            const timeUsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(timeUsed / 60);
+            const seconds = timeUsed % 60;
+
+            // Cálculo de puntaje (solo precisión, sin bono de tiempo)
+            const totalWords = vocabulary.length;
+            const score = Math.round((correct / totalWords) * 100);
+
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('incorrectCount').textContent = incorrect;
+            document.getElementById('timeUsed').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('score').textContent = `${score}/100`;
+
+            // Guardar resultado actual para usarlo cuando el usuario presione el botón
+            currentResult = {
+                fecha: new Date().toISOString(),
+                pagina: 12,
+                capitulo: 1,
+                nombreEjercicio: "Vocabulario - Kappale 1",
+                puntaje: score,
+                puntajeMaximo: 100,
+                tiempo: `${minutes}:${seconds.toString().padStart(2, '0')}`,
+                tiempoSegundos: timeUsed,
+                correctas: correct,
+                incorrectas: incorrect,
+                totalPalabras: totalWords
+            };
+
+            document.getElementById('timerSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+        }
+
+        // Función para guardar el resultado actual cuando el usuario presiona el botón
+        async function saveCurrentResult() {
+            if (!currentResult) {
+                alert('No hay resultados para guardar.');
+                return;
+            }
+
+            try {
+                // Primero guardar en localStorage como backup
+                let resultadosLocal = JSON.parse(localStorage.getItem('finlandes_resultados') || '[]');
+                resultadosLocal.push(currentResult);
+                localStorage.setItem('finlandes_resultados', JSON.stringify(resultadosLocal));
+
+                // Luego guardar en el servidor
+                const response = await fetch('/api/guardar-resultado', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(currentResult)
+                });
+
+                const data = await response.json();
+
+                // Cambiar el botón para mostrar que se guardó
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.textContent = '✓ Guardado';
+                saveBtn.style.background = 'linear-gradient(135deg, #66bb6a 0%, #4caf50 100%)';
+                saveBtn.disabled = true;
+
+                console.log('Resultado guardado:', currentResult);
+                console.log('Respuesta del servidor:', data);
+                console.log(`Total en servidor: ${data.total}, Total local: ${resultadosLocal.length}`);
+
+            } catch (error) {
+                console.error('Error al guardar resultado:', error);
+                console.log('Guardado solo en localStorage (servidor no disponible)');
+
+                // Cambiar el botón aunque solo se guardó localmente
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.textContent = '✓ Guardado';
+                saveBtn.style.background = 'linear-gradient(135deg, #66bb6a 0%, #4caf50 100%)';
+                saveBtn.disabled = true;
+            }
+        }
+
+        function resetPractice() {
+            isPracticing = false;
+            clearInterval(timer);
+            currentResult = null;
+
+            // Resetear botón de guardar
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.textContent = '💾 Guardar Resultado';
+            saveBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)';
+            saveBtn.disabled = false;
+
+            document.getElementById('practiceBtn').style.display = 'inline-block';
+            document.getElementById('timerSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('timer').className = 'timer';
+            renderVocabulary(false);
+        }
+
+        // Renderizar vocabulario inicial
+        renderVocabulary();
+
+        // ============== FRAASIT (FRASES) ==============
+
+        const frases = [
+            {finnish: 'Hyvää huomenta!', spanish: 'Buenos días'},
+            {finnish: 'Päivää!', spanish: '¡Buen día!'},
+            {finnish: 'Hyvää iltaa!', spanish: 'Buenas tardes'},
+            {finnish: 'Hyvää yötä!', spanish: 'Buenas noches'},
+            {finnish: 'Nuku hyvin!', spanish: '¡Duerme bien!'},
+            {finnish: 'Iltaa!', spanish: '¡Buenas noches!'}
+        ];
+
+        let isPracticingFrases = false;
+        let timerFrases;
+        let timeRemainingFrases = 30; // 30 segundos
+        let startTimeFrases;
+        let currentFrasesResult = null;
+
+        function renderFrases(practiceMode = false) {
+            const content = document.getElementById('frasesContent');
+            content.innerHTML = '';
+
+            frases.forEach((frase, index) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;';
+
+                const finnishP = document.createElement('p');
+                finnishP.style.cssText = 'margin: 0; color: #2c3e50; font-weight: 500; margin-bottom: 5px;';
+                finnishP.textContent = frase.finnish;
+
+                const spanishDiv = document.createElement('div');
+                spanishDiv.id = `frase-${index}`;
+
+                if (practiceMode) {
+                    spanishDiv.innerHTML = `<input type="text" class="practice-input" id="input-frase-${index}" data-answer="${frase.spanish.toLowerCase()}" placeholder="Escribe la traducción" style="margin-top: 8px;">`;
+                } else {
+                    const spanishP = document.createElement('p');
+                    spanishP.style.cssText = 'margin: 0; color: #666; font-size: 0.9em; font-style: italic;';
+                    spanishP.textContent = frase.spanish;
+                    spanishDiv.appendChild(spanishP);
+                }
+
+                div.appendChild(finnishP);
+                div.appendChild(spanishDiv);
+                content.appendChild(div);
+            });
+        }
+
+        function startFrasesPractice() {
+            isPracticingFrases = true;
+            timeRemainingFrases = 30;
+            startTimeFrases = Date.now();
+
+            document.getElementById('practiceFrasesBtn').style.display = 'none';
+            document.getElementById('timerFrasesSection').style.display = 'block';
+            document.getElementById('resultsFrasesSection').style.display = 'none';
+
+            renderFrases(true);
+            startFrasesTimer();
+        }
+
+        function startFrasesTimer() {
+            updateFrasesTimerDisplay();
+            timerFrases = setInterval(() => {
+                timeRemainingFrases--;
+                updateFrasesTimerDisplay();
+
+                if (timeRemainingFrases <= 15) {
+                    document.getElementById('timerFrases').className = 'timer warning';
+                }
+                if (timeRemainingFrases <= 5) {
+                    document.getElementById('timerFrases').className = 'timer danger';
+                }
+                if (timeRemainingFrases <= 0) {
+                    checkFrasesAnswers();
+                }
+            }, 1000);
+        }
+
+        function updateFrasesTimerDisplay() {
+            const minutes = Math.floor(timeRemainingFrases / 60);
+            const seconds = timeRemainingFrases % 60;
+            document.getElementById('timerFrases').textContent =
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function checkFrasesAnswers() {
+            clearInterval(timerFrases);
+
+            let correct = 0;
+            let incorrect = 0;
+
+            frases.forEach((frase, index) => {
+                const input = document.getElementById(`input-frase-${index}`);
+                if (input) {
+                    const userAnswer = normalizeText(input.value);
+                    const correctAnswer = normalizeText(frase.spanish);
+
+                    if (userAnswer === correctAnswer) {
+                        input.className = 'practice-input correct';
+                        correct++;
+                    } else {
+                        input.className = 'practice-input incorrect';
+                        input.value = `❌ ${input.value} | ✓ ${frase.spanish}`;
+                        incorrect++;
+                    }
+                    input.disabled = true;
+                }
+            });
+
+            const timeUsed = Math.floor((Date.now() - startTimeFrases) / 1000);
+            const minutes = Math.floor(timeUsed / 60);
+            const seconds = timeUsed % 60;
+
+            const totalFrases = frases.length;
+            const score = Math.round((correct / totalFrases) * 100);
+
+            document.getElementById('correctFrasesCount').textContent = correct;
+            document.getElementById('incorrectFrasesCount').textContent = incorrect;
+            document.getElementById('timeFrasesUsed').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('scoreFrases').textContent = `${score}/100`;
+
+            currentFrasesResult = {
+                fecha: new Date().toISOString(),
+                pagina: 12,
+                capitulo: 1,
+                nombreEjercicio: "Fraasit - Kappale 1",
+                puntaje: score,
+                puntajeMaximo: 100,
+                tiempo: `${minutes}:${seconds.toString().padStart(2, '0')}`,
+                tiempoSegundos: timeUsed,
+                correctas: correct,
+                incorrectas: incorrect,
+                totalPalabras: totalFrases
+            };
+
+            document.getElementById('timerFrasesSection').style.display = 'none';
+            document.getElementById('resultsFrasesSection').style.display = 'block';
+        }
+
+        async function saveCurrentFrasesResult() {
+            if (!currentFrasesResult) {
+                return;
+            }
+
+            try {
+                let resultadosLocal = JSON.parse(localStorage.getItem('finlandes_resultados') || '[]');
+                resultadosLocal.push(currentFrasesResult);
+                localStorage.setItem('finlandes_resultados', JSON.stringify(resultadosLocal));
+
+                const response = await fetch('/api/guardar-resultado', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(currentFrasesResult)
+                });
+
+                const data = await response.json();
+
+                const saveBtn = document.getElementById('saveFrasesBtn');
+                saveBtn.textContent = '✓ Guardado';
+                saveBtn.style.background = 'linear-gradient(135deg, #66bb6a 0%, #4caf50 100%)';
+                saveBtn.disabled = true;
+
+                console.log('Resultado Fraasit guardado:', currentFrasesResult);
+                console.log('Respuesta del servidor:', data);
+                console.log(`Total en servidor: ${data.total}, Total local: ${resultadosLocal.length}`);
+
+            } catch (error) {
+                console.error('Error al guardar resultado Fraasit:', error);
+                console.log('Guardado solo en localStorage (servidor no disponible)');
+
+                const saveBtn = document.getElementById('saveFrasesBtn');
+                saveBtn.textContent = '✓ Guardado';
+                saveBtn.style.background = 'linear-gradient(135deg, #66bb6a 0%, #4caf50 100%)';
+                saveBtn.disabled = true;
+            }
+        }
+
+        function resetFrasesPractice() {
+            isPracticingFrases = false;
+            clearInterval(timerFrases);
+            currentFrasesResult = null;
+
+            const saveBtn = document.getElementById('saveFrasesBtn');
+            saveBtn.textContent = '💾 Guardar Resultado';
+            saveBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)';
+            saveBtn.disabled = false;
+
+            document.getElementById('practiceFrasesBtn').style.display = 'inline-block';
+            document.getElementById('timerFrasesSection').style.display = 'none';
+            document.getElementById('resultsFrasesSection').style.display = 'none';
+            document.getElementById('timerFrases').className = 'timer';
+            renderFrases(false);
+        }
+
+        // Renderizar frases inicial
+        renderFrases();
+    </script>
+</body>
+</html>

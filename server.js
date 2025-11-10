@@ -4,15 +4,83 @@ const homepage = 'home.html';
 const express = require('express');
 const os = require('os');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const http = require('http').createServer(app);
+
+// Middleware para parsear JSON
+app.use(express.json());
 
 const publicPath = path.resolve(__dirname);
 app.use(express.static(publicPath));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, homepage));
+});
+
+// Endpoint para guardar resultados
+app.post('/api/guardar-resultado', (req, res) => {
+  try {
+    const resultado = req.body;
+    const filePath = path.join(__dirname, 'data', 'resultados.json');
+
+    // Leer archivo existente
+    let resultados = [];
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      resultados = JSON.parse(data);
+    }
+
+    // Buscar si ya existe un resultado para este ejercicio
+    const existingIndex = resultados.findIndex(r =>
+      r.pagina === resultado.pagina &&
+      r.capitulo === resultado.capitulo &&
+      r.nombreEjercicio === resultado.nombreEjercicio
+    );
+
+    let action = 'guardado';
+
+    if (existingIndex !== -1) {
+      // Si existe, comparar puntajes
+      const existingScore = resultados[existingIndex].puntaje;
+      const newScore = resultado.puntaje;
+
+      if (newScore > existingScore) {
+        // Reemplazar con el mejor resultado
+        resultados[existingIndex] = resultado;
+        action = 'actualizado (mejor puntaje)';
+        console.log(`Resultado actualizado: ${newScore} > ${existingScore}`);
+      } else {
+        // No guardar, el anterior es mejor
+        action = 'no guardado (puntaje menor o igual)';
+        console.log(`Resultado no guardado: ${newScore} <= ${existingScore}`);
+      }
+    } else {
+      // No existe, agregar nuevo resultado
+      resultados.push(resultado);
+      action = 'guardado (nuevo)';
+    }
+
+    // Guardar archivo con formato bonito
+    fs.writeFileSync(filePath, JSON.stringify(resultados, null, 2), 'utf8');
+
+    console.log('Resultado ' + action + ':', resultado);
+    res.json({
+      success: true,
+      message: 'Resultado ' + action,
+      action: action,
+      total: resultados.length
+    });
+
+  } catch (error) {
+    console.error('Error al guardar resultado:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al guardar el resultado',
+      error: error.message
+    });
+  }
 });
 
 http.listen(PORT, () => {

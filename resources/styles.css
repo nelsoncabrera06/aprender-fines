@@ -18,6 +18,13 @@ body {
     padding: 40px 50px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.3);
     border-radius: 5px;
+    position: relative;
+}
+
+/* Para páginas con dos columnas (libro abierto) */
+.book-page.two-pages {
+    max-width: 1600px;
+    padding: 40px 60px;
 }
 
 h1 {
@@ -188,9 +195,12 @@ h1 {
 .navigation-buttons {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 15px;
     margin-top: 30px;
     padding-top: 20px;
     border-top: 2px solid #ddd;
+    flex-wrap: wrap;
 }
 
 .nav-button {
@@ -234,4 +244,101 @@ h1 {
 .nav-button.next::after {
     content: "→";
     font-size: 1.2em;
+}
+
+/* Selector de páginas */
+.page-selector-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    justify-content: center;
+    min-width: 250px;
+}
+
+.page-selector-label {
+    color: #2c3e50;
+    font-weight: bold;
+    font-size: 0.95em;
+    white-space: nowrap;
+}
+
+.page-input {
+    width: 80px;
+    padding: 10px 12px;
+    border: 2px solid #c69c6d;
+    border-radius: 8px;
+    background: white;
+    color: #2c3e50;
+    font-size: 1em;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    text-align: center;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.page-input:hover {
+    border-color: #7a9d7e;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.page-input:focus {
+    outline: none;
+    border-color: #7a9d7e;
+    box-shadow: 0 0 0 3px rgba(122, 157, 126, 0.2);
+}
+
+/* Botón de inicio (casita) */
+.home-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #7a9d7e 0%, #5d7c61 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8em;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.home-button:hover {
+    transform: scale(1.15) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    background: linear-gradient(135deg, #6a8d6e 0%, #4d6c51 100%);
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .page-selector-container {
+        width: 100%;
+        order: -1;
+    }
+
+    .nav-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .page-input {
+        width: 100px;
+    }
+
+    .home-button {
+        top: 10px;
+        left: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.3em;
+    }
 }

@@ -2,6 +2,7 @@
 backup/
 dist/
 Fotos/
+pages/assets/
 
 # Archivos temporales
 *.log
@@ -9,4 +10,10 @@ Fotos/
 
 # Archivos del sistema
 .DS_Store
+.claude/
 
+# mis cosas
+dev_local/
+
+# mis puntajes
+data/
